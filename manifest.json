@@ -1,0 +1,21 @@
+{
+  "name": "Vanessa 💖",
+  "short_name": "Vane",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#ff99bb",
+  "theme_color": "#ff6699",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "iconopag.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "iconopag.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

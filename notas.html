@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Notas</title>
+    
+    <link rel="icon" type="image/png" href="iconopag.png">
+    <link rel="apple-touch-icon" href="iconopag.png">
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ff6699">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --c-strawberry: #ff1a75;
+            --c-soft-pink: #ffb3c6;
+            --bg-white: #ffffff;
+            --text-main: #4a1525;
+            --kawaii-shadow: 4px 4px 0px #ff1a75;
+            --kawaii-shadow-sm: 2px 2px 0px #ff1a75;
+        }
+
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent; 
+            font-family: 'Quicksand', sans-serif; 
+        }
+
+        /* FONDO TIERNO DE CORAZONES Y FRESITAS */
+        body { 
+            background-color: #ff99bb;
+            background-image: 
+                radial-gradient(circle, #ff3366 15%, transparent 16%),
+                radial-gradient(circle, #ffffff 15%, transparent 16%);
+            background-size: 60px 60px;
+            background-position: 0 0, 30px 30px;
+            color: var(--text-main); 
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .mobile-container {
+            width: 100%; 
+            max-width: 600px; 
+            margin: 0 auto;
+            padding: calc(env(safe-area-inset-top, 20px) + 20px) 20px 40px 20px;
+            position: relative;
+            z-index: 10;
+        }
+        
+        /* BOTONES DE NAVEGACIÓN SUPERIOR */
+        .nav-buttons { 
+            position: absolute;
+            top: calc(env(safe-area-inset-top, 20px) + 20px);
+            left: 20px;
+            right: 20px;
+            display: flex; 
+            justify-content: space-between; 
+            z-index: 100;
+            pointer-events: none;
+        }
+        .nav-btn {
+            pointer-events: auto;
+            text-decoration: none; 
+            color: var(--c-strawberry);
+            background: var(--bg-white); 
+            width: 48px; height: 48px; 
+            border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s ease; 
+            border: 3px solid var(--c-strawberry);
+            box-shadow: var(--kawaii-shadow-sm);
+        }
+        .nav-btn:active { 
+            background: var(--c-strawberry);
+            color: var(--bg-white);
+            transform: translate(2px, 2px); 
+            box-shadow: 0px 0px 0px transparent;
+        }
+        .nav-btn i { font-size: 1.2rem; }
+
+        /* HEADER */
+        .hub-header { text-align: center; margin-bottom: 25px; position: relative; }
+        
+        .profile-wrapper { 
+            position: relative; width: 120px; height: 120px; 
+            margin: 0 auto 12px auto; 
+            display: flex; justify-content: center; align-items: center;
+        }
+        
+        .orbiting-ring {
+            position: absolute;
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            border: 3px dashed var(--bg-white);
+            animation: spin 12s linear infinite;
+            z-index: 1;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        
+        .profile-pic {
+            width: 96px; height: 96px; border-radius: 50%;
+            background: var(--bg-white); padding: 4px; 
+            border: 3px solid var(--c-strawberry);
+            box-shadow: var(--kawaii-shadow-sm);
+            position: relative; z-index: 2; overflow: hidden;
+        }
+        .profile-pic img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+
+        .hub-header h1 { 
+            font-size: 1.9rem; font-weight: 800; color: #fff; 
+            text-shadow: 3px 3px 0px var(--c-strawberry);
+            margin-bottom: 8px; letter-spacing: 0.5px;
+            display: inline-block;
+        }
+        
+        .live-clock { 
+            font-size: 0.85rem; font-weight: 800; color: var(--text-main); 
+            background: var(--bg-white); padding: 6px 18px; 
+            border-radius: 20px; border: 3px solid var(--c-strawberry);
+            display: inline-block; box-shadow: var(--kawaii-shadow-sm);
+        }
+
+        /* BOTÓN PRINCIPAL NUEVA NOTA */
+        .new-note-btn-container {
+            margin-bottom: 25px;
+        }
+        
+        .kawaii-main-btn {
+            width: 100%;
+            background: var(--bg-white);
+            color: var(--c-strawberry);
+            border: 3px solid var(--c-strawberry);
+            border-radius: 22px;
+            padding: 16px;
+            font-size: 1.1rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: var(--kawaii-shadow);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .kawaii-main-btn:active {
+            background: var(--c-strawberry);
+            color: #fff;
+            transform: translate(2px, 2px);
+            box-shadow: 0px 0px 0px transparent;
+        }
+
+        /* VENTANAS EMERGENTES (MODALES) */
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 102, 153, 0.8); backdrop-filter: blur(4px);
+            z-index: 9999; display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: 0.3s ease; padding: 20px;
+        }
+        .modal-overlay.show { opacity: 1; pointer-events: auto; }
+        
+        .modal-content {
+            background: var(--bg-white); padding: 25px 20px; border-radius: 28px;
+            border: 3px solid var(--c-strawberry);
+            box-shadow: var(--kawaii-shadow); position: relative; 
+            max-width: 360px; width: 100%; transform: scale(0.8); 
+            transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-align: center;
+        }
+        .modal-overlay.show .modal-content { transform: scale(1); }
+        
+        .modal-content h3 { 
+            color: var(--c-strawberry); margin-bottom: 16px; font-size: 1.3rem; font-weight: 800;
+        }
+        
+        .modal-content p {
+            color: var(--text-main); font-weight: 700; font-size: 1rem; margin-bottom: 20px; line-height: 1.4;
+        }
+
+        .note-input, .note-textarea {
+            width: 100%;
+            border: 2px solid var(--c-soft-pink);
+            border-radius: 14px;
+            padding: 12px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--text-main);
+            outline: none;
+            margin-bottom: 14px;
+            background: #fff5f8;
+            transition: 0.2s ease;
+            text-align: left;
+        }
+        .note-input:focus, .note-textarea:focus {
+            border-color: var(--c-strawberry);
+            background: #fff;
+        }
+        .note-textarea {
+            resize: vertical;
+            min-height: 110px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 14px;
+            font-size: 0.95rem;
+            font-weight: 800;
+            cursor: pointer;
+            border: 3px solid var(--c-strawberry);
+            transition: all 0.2s ease;
+            box-shadow: var(--kawaii-shadow-sm);
+        }
+        
+        .modal-btn.save {
+            background: var(--c-strawberry);
+            color: #fff;
+        }
+        .modal-btn.save:active {
+            transform: translate(2px, 2px);
+            box-shadow: 0 0 0 transparent;
+        }
+
+        .modal-btn.cancel {
+            background: var(--bg-white);
+            color: var(--c-strawberry);
+        }
+        .modal-btn.cancel:active {
+            background: var(--c-soft-pink);
+            transform: translate(2px, 2px);
+            box-shadow: 0 0 0 transparent;
+        }
+
+        .modal-btn.danger {
+            background: #ff4d4d;
+            color: #fff;
+            border-color: #cc0000;
+        }
+
+        /* LISTA DE NOTAS */
+        .notes-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .note-card {
+            background: var(--bg-white);
+            border: 3px solid var(--c-strawberry);
+            border-radius: 22px;
+            padding: 16px 18px;
+            box-shadow: var(--kawaii-shadow-sm);
+            position: relative;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .note-card h3 {
+            font-size: 1.1rem;
+            color: var(--c-strawberry);
+            margin-bottom: 6px;
+            font-weight: 800;
+            padding-right: 75px;
+            text-align: left;
+        }
+        .note-card p {
+            font-size: 0.9rem;
+            color: var(--text-main);
+            white-space: pre-wrap;
+            line-height: 1.4;
+            font-weight: 600;
+            text-align: left;
+        }
+
+        .note-actions {
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            display: flex;
+            gap: 6px;
+        }
+        
+        .action-icon-btn {
+            background: #ffe6f0;
+            border: 2px solid var(--c-strawberry);
+            color: var(--c-strawberry);
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: 0.2s ease;
+        }
+        .action-icon-btn:active {
+            background: var(--c-strawberry);
+            color: #fff;
+            transform: scale(0.9);
+        }
+
+        .empty-notes {
+            text-align: center;
+            background: var(--bg-white);
+            border: 3px dashed var(--c-soft-pink);
+            border-radius: 20px;
+            padding: 30px;
+            color: var(--text-main);
+            font-weight: 800;
+            font-size: 0.95rem;
+        }
+    </style>
+</head>
+<body id="mainBody">
+    <div class="mobile-container">
+        
+        <!-- NAVEGACIÓN SUPERIOR -->
+        <div class="nav-buttons">
+            <a href="index.html" class="nav-btn" title="Ir al Horario">
+                <i class="fa-solid fa-calendar-days"></i>
+            </a>
+            <a href="contraseñas.html" class="nav-btn" title="Ir a Contraseñas">
+                <i class="fa-solid fa-key"></i>
+            </a>
+        </div>
+        
+        <header class="hub-header">
+            <div class="profile-wrapper">
+                <div class="orbiting-ring"></div>
+                <div class="profile-pic">
+                    <img src="icono.png" alt="Vanessa">
+                </div>
+            </div>
+            <h1>Mis Notas 🍓</h1>
+            <div class="live-clock" id="liveClock">Cargando hora...</div>
+        </header>
+
+        <!-- BOTÓN NUEVA NOTA -->
+        <div class="new-note-btn-container">
+            <button class="kawaii-main-btn" onclick="openNewModal()">
+                <i class="fa-solid fa-plus-circle"></i> Nueva Nota 🍓
+            </button>
+        </div>
+
+        <!-- CONTENEDOR DE NOTAS -->
+        <div class="notes-list" id="notesContainer"></div>
+    </div>
+
+    <!-- VENTANA EMERGENTE: NUEVA NOTA -->
+    <div class="modal-overlay" id="newNoteModal">
+        <div class="modal-content">
+            <h3>✨ Nueva Nota 🍓</h3>
+            <input type="text" id="newNoteTitle" class="note-input" placeholder="Título..." autocomplete="off">
+            <textarea id="newNoteContent" class="note-textarea" placeholder="Escribe tu nota aquí... 💖"></textarea>
+            
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" onclick="closeNewModal()">Cancelar</button>
+                <button class="modal-btn save" onclick="saveNewNote()">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- VENTANA EMERGENTE: EDITAR NOTA -->
+    <div class="modal-overlay" id="editNoteModal">
+        <div class="modal-content">
+            <h3>✏️ Editar Nota 🍓</h3>
+            <input type="hidden" id="editNoteId">
+            <input type="text" id="editNoteTitle" class="note-input" placeholder="Título..." autocomplete="off">
+            <textarea id="editNoteContent" class="note-textarea" placeholder="Edita tu nota aquí... 💖"></textarea>
+            
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" onclick="closeEditModal()">Cancelar</button>
+                <button class="modal-btn save" onclick="confirmEditNote()">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- VENTANA EMERGENTE: BORRAR NOTA -->
+    <div class="modal-overlay" id="deleteNoteModal">
+        <div class="modal-content">
+            <h3>⚠️ Eliminar Nota</h3>
+            <p>¿Estás segura de que deseas borrar esta nota? 🥺</p>
+            <input type="hidden" id="deleteNoteId">
+            
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" onclick="closeDeleteModal()">Cancelar</button>
+                <button class="modal-btn danger" onclick="confirmDeleteNote()">Borrar</button>
+            </div>
+        </div>
+    </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        updateClock();
+        setInterval(updateClock, 1000);
+        loadNotes();
+    });
+
+    function updateClock() {
+        const now = new Date();
+        const options = { weekday: 'long', day: 'numeric', month: 'long' };
+        let dateStr = now.toLocaleDateString('es-ES', options);
+        dateStr = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+        
+        let h = now.getHours();
+        let m = now.getMinutes();
+        let s = now.getSeconds();
+        const ampm = h >= 12 ? 'PM' : 'AM';
+        h = h % 12 || 12;
+        
+        const timeStr = `${h}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')} ${ampm}`;
+        document.getElementById('liveClock').innerText = `${dateStr} | ${timeStr}`;
+    }
+
+    // --- FUNCIONES NUEVA NOTA ---
+    function openNewModal() {
+        document.getElementById('newNoteTitle').value = '';
+        document.getElementById('newNoteContent').value = '';
+        document.getElementById('newNoteModal').classList.add('show');
+        if(navigator.vibrate) navigator.vibrate(40);
+    }
+
+    function closeNewModal() {
+        document.getElementById('newNoteModal').classList.remove('show');
+        if(navigator.vibrate) navigator.vibrate(30);
+    }
+
+    function saveNewNote() {
+        const titleInput = document.getElementById('newNoteTitle');
+        const contentInput = document.getElementById('newNoteContent');
+        
+        const title = titleInput.value.trim();
+        const content = contentInput.value.trim();
+
+        if (!title && !content) {
+            alert('¡Escribe al menos un título o contenido para tu nota! 🍓');
+            return;
+        }
+
+        const notes = getNotes();
+        const newNote = {
+            id: Date.now(),
+            title: title || 'Nota sin título',
+            content: content
+        };
+
+        notes.unshift(newNote);
+        saveNotes(notes);
+        closeNewModal();
+        loadNotes();
+
+        if(navigator.vibrate) navigator.vibrate(50);
+    }
+
+    // --- FUNCIONES EDITAR NOTA ---
+    function openEditModal(id) {
+        const notes = getNotes();
+        const note = notes.find(n => n.id === id);
+        if(!note) return;
+
+        document.getElementById('editNoteId').value = note.id;
+        document.getElementById('editNoteTitle').value = note.title;
+        document.getElementById('editNoteContent').value = note.content;
+        
+        document.getElementById('editNoteModal').classList.add('show');
+        if(navigator.vibrate) navigator.vibrate(40);
+    }
+
+    function closeEditModal() {
+        document.getElementById('editNoteModal').classList.remove('show');
+        if(navigator.vibrate) navigator.vibrate(30);
+    }
+
+    function confirmEditNote() {
+        const id = parseInt(document.getElementById('editNoteId').value);
+        const title = document.getElementById('editNoteTitle').value.trim();
+        const content = document.getElementById('editNoteContent').value.trim();
+
+        if (!title && !content) {
+            alert('¡La nota no puede quedarse vacía! 🍓');
+            return;
+        }
+
+        let notes = getNotes();
+        notes = notes.map(n => {
+            if (n.id === id) {
+                return { ...n, title: title || 'Nota sin título', content: content };
+            }
+            return n;
+        });
+
+        saveNotes(notes);
+        closeEditModal();
+        loadNotes();
+        if(navigator.vibrate) navigator.vibrate(50);
+    }
+
+    // --- FUNCIONES BORRAR NOTA ---
+    function openDeleteModal(id) {
+        document.getElementById('deleteNoteId').value = id;
+        document.getElementById('deleteNoteModal').classList.add('show');
+        if(navigator.vibrate) navigator.vibrate(40);
+    }
+
+    function closeDeleteModal() {
+        document.getElementById('deleteNoteModal').classList.remove('show');
+        if(navigator.vibrate) navigator.vibrate(30);
+    }
+
+    function confirmDeleteNote() {
+        const id = parseInt(document.getElementById('deleteNoteId').value);
+        let notes = getNotes();
+        notes = notes.filter(n => n.id !== id);
+        saveNotes(notes);
+        closeDeleteModal();
+        loadNotes();
+        if(navigator.vibrate) navigator.vibrate(40);
+    }
+
+    // --- MANEJO DE LOCALSTORAGE ---
+    function getNotes() {
+        const notes = localStorage.getItem('vane_notas');
+        return notes ? JSON.parse(notes) : [];
+    }
+
+    function saveNotes(notes) {
+        localStorage.setItem('vane_notas', JSON.stringify(notes));
+    }
+
+    function loadNotes() {
+        const container = document.getElementById('notesContainer');
+        const notes = getNotes();
+
+        if (notes.length === 0) {
+            container.innerHTML = `
+                <div class="empty-notes">
+                    No tienes notas guardadas todavía 🌸<br>¡Toca el botón de arriba para crear una!
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = '';
+        notes.forEach(note => {
+            container.innerHTML += `
+                <div class="note-card">
+                    <div class="note-actions">
+                        <div class="action-icon-btn" onclick="openEditModal(${note.id})" title="Editar">
+                            <i class="fa-solid fa-pen"></i>
+                        </div>
+                        <div class="action-icon-btn" onclick="openDeleteModal(${note.id})" title="Eliminar">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </div>
+                    </div>
+                    <h3>${escapeHtml(note.title)}</h3>
+                    <p>${escapeHtml(note.content)}</p>
+                </div>
+            `;
+        });
+    }
+
+    function escapeHtml(text) {
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+        return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+    }
+</script>
+</body>
+</html>

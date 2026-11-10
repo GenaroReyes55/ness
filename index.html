@@ -1,0 +1,756 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Ness</title>
+    
+    <link rel="icon" type="image/png" href="iconopag.png">
+    <link rel="apple-touch-icon" href="iconopag.png">
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#ff6699">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --c-strawberry: #ff1a75;
+            --c-soft-pink: #ffb3c6;
+            --bg-white: #ffffff;
+            --text-main: #4a1525;
+            --kawaii-shadow: 4px 4px 0px #ff1a75;
+            --kawaii-shadow-sm: 2px 2px 0px #ff1a75;
+        }
+
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent; 
+            font-family: 'Quicksand', sans-serif; 
+        }
+
+        /* FONDO ESTILO CORAZONES Y FRESITAS */
+        body { 
+            background-color: #ff99bb;
+            background-image: 
+                radial-gradient(circle, #ff3366 15%, transparent 16%),
+                radial-gradient(circle, #ffffff 15%, transparent 16%);
+            background-size: 60px 60px;
+            background-position: 0 0, 30px 30px;
+            color: var(--text-main); 
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .mobile-container {
+            width: 100%; 
+            max-width: 600px; 
+            margin: 0 auto;
+            padding: calc(env(safe-area-inset-top, 20px) + 20px) 20px 40px 20px;
+            position: relative;
+            z-index: 10;
+        }
+        
+        /* BOTONES DE NAVEGACIÓN SUPERIOR */
+        .nav-buttons { 
+            position: absolute;
+            top: calc(env(safe-area-inset-top, 20px) + 20px);
+            left: 20px;
+            right: 20px;
+            display: flex; 
+            justify-content: space-between; 
+            z-index: 100;
+            pointer-events: none;
+        }
+        .nav-btn {
+            pointer-events: auto;
+            text-decoration: none; 
+            color: var(--c-strawberry);
+            background: var(--bg-white); 
+            width: 48px; height: 48px; 
+            border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s ease; 
+            border: 3px solid var(--c-strawberry);
+            box-shadow: var(--kawaii-shadow-sm);
+        }
+        .nav-btn:active { 
+            background: var(--c-strawberry);
+            color: var(--bg-white);
+            transform: translate(2px, 2px); 
+            box-shadow: 0px 0px 0px transparent;
+        }
+        .nav-btn i { font-size: 1.2rem; }
+
+        /* HEADER */
+        .hub-header { text-align: center; margin-bottom: 25px; position: relative; }
+        
+        .profile-wrapper { 
+            position: relative; width: 120px; height: 120px; 
+            margin: 0 auto 12px auto; 
+            display: flex; justify-content: center; align-items: center;
+        }
+        
+        .orbiting-ring {
+            position: absolute;
+            width: 100%; height: 100%;
+            border-radius: 50%;
+            border: 3px dashed var(--bg-white);
+            animation: spin 12s linear infinite;
+            z-index: 1;
+        }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        
+        .profile-pic {
+            width: 96px; height: 96px; border-radius: 50%;
+            background: var(--bg-white); padding: 4px; 
+            border: 3px solid var(--c-strawberry);
+            box-shadow: var(--kawaii-shadow-sm);
+            position: relative; z-index: 2; overflow: hidden;
+            cursor: pointer; transition: 0.2s ease;
+        }
+        .profile-pic:active { transform: scale(0.9); }
+        .profile-pic img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+
+        .hub-header h1 { 
+            font-size: 1.9rem; font-weight: 800; color: #fff; 
+            text-shadow: 3px 3px 0px var(--c-strawberry);
+            margin-bottom: 8px; letter-spacing: 0.5px;
+            display: inline-block; cursor: pointer; transition: 0.2s ease;
+        }
+        .hub-header h1:active { transform: scale(0.95); }
+        
+        .live-clock { 
+            font-size: 0.85rem; font-weight: 800; color: var(--text-main); 
+            background: var(--bg-white); padding: 6px 18px; 
+            border-radius: 20px; border: 3px solid var(--c-strawberry);
+            display: inline-block; box-shadow: var(--kawaii-shadow-sm);
+        }
+
+        /* WIDGET DE ESTADO ACTUAL */
+        .schedule-widget {
+            background: var(--bg-white);
+            border: 3px solid var(--c-strawberry);
+            border-radius: 24px;
+            padding: 20px; margin-bottom: 20px; 
+            box-shadow: var(--kawaii-shadow);
+            position: relative;
+        }
+        .schedule-widget::before {
+            content: '🍓'; position: absolute; top: -14px; left: -10px; 
+            font-size: 1.6rem; transform: rotate(-20deg);
+        }
+        .schedule-widget::after {
+            content: '💖'; position: absolute; bottom: -10px; right: -8px; 
+            font-size: 1.4rem; transform: rotate(15deg);
+        }
+        .sw-header { display: flex; align-items: center; gap: 14px; margin-bottom: 12px; }
+        .sw-icon {
+            width: 46px; height: 46px; background: #ffe6f0; 
+            border-radius: 50%; border: 3px solid var(--c-strawberry);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem; color: var(--c-strawberry);
+        }
+        .sw-main-info { flex: 1; }
+        .sw-label { 
+            font-size: 0.65rem; font-weight: 800; color: #fff; 
+            background: var(--c-strawberry); padding: 2px 8px; border-radius: 10px;
+            text-transform: uppercase; letter-spacing: 0.8px; display: inline-block; margin-bottom: 4px;
+        }
+        .sw-class { font-size: 1.15rem; font-weight: 800; color: var(--text-main); line-height: 1.2; }
+        
+        .sw-progress-container { height: 10px; background: #ffe6f0; border-radius: 10px; overflow: hidden; margin: 12px 0 10px 0; border: 2px solid var(--c-soft-pink); }
+        .sw-progress-bar { height: 100%; background: var(--c-strawberry); width: 0%; border-radius: 5px; transition: width 0.8s ease; }
+        
+        .sw-footer { display: flex; justify-content: space-between; align-items: center; }
+        .sw-detail { font-size: 0.75rem; font-weight: 800; color: var(--c-strawberry); }
+        .sw-next { font-size: 0.75rem; color: var(--text-main); font-weight: 800; text-align: right; max-width: 60%; }
+
+        /* SELECTOR DE DÍAS */
+        .day-selector { display: flex; gap: 6px; margin-bottom: 20px; }
+        .day-btn { 
+            flex: 1; text-align: center; padding: 10px 0; font-size: 0.75rem; font-weight: 800; 
+            color: var(--c-strawberry); background: var(--bg-white); 
+            border: 3px solid var(--c-strawberry); border-radius: 16px; 
+            cursor: pointer; transition: all 0.2s ease;
+            box-shadow: var(--kawaii-shadow-sm);
+        }
+        .day-btn.active { 
+            background: var(--c-strawberry); color: #fff; 
+            box-shadow: 0px 0px 0px transparent;
+            transform: translate(2px, 2px);
+        }
+
+        /* TABLERO DE HORARIOS */
+        .schedule-board {
+            background: var(--bg-white);
+            border: 3px solid var(--c-strawberry);
+            border-radius: 24px;
+            box-shadow: var(--kawaii-shadow);
+            padding: 18px 10px;
+            margin-bottom: 20px;
+        }
+        .board-header {
+            display: flex;
+            margin-bottom: 12px;
+            border-bottom: 3px solid #ffe6f0;
+            padding-bottom: 10px;
+        }
+        .col-head {
+            flex: 1;
+            text-align: center;
+            font-weight: 800;
+            color: var(--c-strawberry);
+            font-size: 1.1rem;
+        }
+        .time-head {
+            width: 70px;
+            flex: none;
+            text-align: right;
+            padding-right: 10px;
+            font-size: 0.9rem;
+            color: var(--c-strawberry);
+        }
+        .board-body {
+            position: relative;
+            display: flex;
+            height: 560px;
+            margin-top: 5px;
+        }
+        .grid-lines {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            pointer-events: none;
+            z-index: 1;
+        }
+        .grid-line {
+            height: 80px;
+            border-top: 2px dashed #ffe6f0;
+            box-sizing: border-box;
+        }
+        .schedule-col {
+            flex: 1;
+            position: relative;
+            z-index: 2;
+            margin-right: 0px;
+        }
+        .timeline-col {
+            width: 70px;
+            flex: none;
+            position: relative;
+            z-index: 2;
+            border-left: 3px solid #ffe6f0;
+        }
+        .time-label {
+            height: 80px;
+            position: relative;
+        }
+        .time-label span {
+            position: absolute;
+            top: -8px;
+            left: 8px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: var(--text-main);
+        }
+
+        /* TARJETAS DE MATERIAS */
+        .class-card {
+            border-radius: 14px; 
+            padding: 6px 8px; 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 2px;
+            border: 2px solid var(--c-soft-pink); 
+            box-shadow: 2px 2px 0px var(--c-soft-pink);
+            position: absolute; width: 95%; left: 2.5%;
+            transition: all 0.2s ease;
+            overflow: hidden;
+        }
+        .cc-name { font-size: 0.8rem; font-weight: 800; color: var(--text-main); line-height: 1.15; }
+        .cc-time { 
+            font-size: 0.65rem; font-weight: 800; color: var(--text-main);
+            background: rgba(255,255,255,0.9);
+            padding: 1px 6px; border-radius: 8px; display: inline-block;
+        }
+
+        /* COLORES PASTEL VIVOS */
+        .bg-1 { background: #d0f0fd; border-color: #38bdf8; } .bg-1 .cc-time { background: #bae6fd; }
+        .bg-2 { background: #fef08a; border-color: #facc15; } .bg-2 .cc-time { background: #fde047; }
+        .bg-3 { background: #ffccd5; border-color: #ff4d6d; } .bg-3 .cc-time { background: #ffb3c6; }
+        .bg-4 { background: #d8f3dc; border-color: #52b788; } .bg-4 .cc-time { background: #b7e4c7; }
+
+        @keyframes kawaii-bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+        .class-card.active-class {
+            border-color: var(--c-strawberry); 
+            border-width: 3px;
+            animation: kawaii-bounce 1.5s infinite; 
+            z-index: 10;
+        }
+        .current-indicator {
+            position: absolute; top: -8px; right: 50%; transform: translateX(50%);
+            background: var(--c-strawberry); color: #fff;
+            font-size: 0.55rem; font-weight: 800; padding: 2px 6px;
+            border-radius: 8px; letter-spacing: 0.5px; border: 2px solid #fff;
+            z-index: 11; white-space: nowrap;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+        }
+
+        .falling-item {
+            position: fixed; top: -50px; font-size: 1.8rem;
+            animation: fall linear forwards; z-index: 999; pointer-events: none;
+        }
+        @keyframes fall { to { transform: translateY(110vh) rotate(360deg); } }
+
+        /* MODALES */
+        .secret-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(255, 102, 153, 0.85); backdrop-filter: blur(4px);
+            z-index: 9999; display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: 0.3s ease; padding: 20px;
+        }
+        .secret-modal.show { opacity: 1; pointer-events: auto; }
+        .secret-content {
+            background: var(--bg-white); padding: 30px 20px; border-radius: 28px;
+            text-align: center; border: 3px solid var(--c-strawberry);
+            box-shadow: var(--kawaii-shadow); position: relative; 
+            max-width: 320px; width: 100%; transform: scale(0.8); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .secret-modal.show .secret-content { transform: scale(1); }
+        .secret-content h3 { color: var(--c-strawberry); margin-bottom: 12px; font-size: 1.4rem; }
+        .secret-content p { color: var(--text-main); font-weight: 800; font-size: 1.05rem; line-height: 1.4; }
+        
+        .close-secret {
+            position: absolute; top: -14px; right: -14px; width: 38px; height: 38px;
+            background: var(--bg-white); border: 3px solid var(--c-strawberry); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem; color: var(--c-strawberry); cursor: pointer; box-shadow: var(--kawaii-shadow-sm);
+        }
+        .close-secret:active { transform: translate(2px,2px); box-shadow: 0 0 0 transparent; }
+
+        /* BOTONES DE RESPALDO */
+        .backup-btn {
+            width: 100%; background: var(--c-strawberry); color: #fff;
+            border: 3px solid #fff; border-radius: 18px;
+            padding: 12px; font-size: 0.95rem; font-weight: 800;
+            box-shadow: var(--kawaii-shadow-sm); cursor: pointer;
+            transition: 0.2s ease; display: flex; justify-content: center; align-items: center; gap: 8px;
+            margin-bottom: 12px;
+        }
+        .backup-btn:active { transform: translate(2px, 2px); box-shadow: 0 0 0 transparent; }
+        .backup-btn.upload { background: var(--bg-white); color: var(--c-strawberry); border-color: var(--c-strawberry); }
+        .backup-btn.upload:active { background: var(--c-strawberry); color: #fff; }
+    </style>
+</head>
+<body id="mainBody">
+    <div class="mobile-container">
+        
+        <div class="nav-buttons">
+            <a href="notas.html" class="nav-btn" title="Ir a Notas">
+                <i class="fa-solid fa-note-sticky"></i>
+            </a>
+            <a href="contraseñas.html" class="nav-btn" title="Ir a Contraseñas">
+                <i class="fa-solid fa-key"></i>
+            </a>
+        </div>
+        
+        <header class="hub-header" id="headerTag">
+            <div class="profile-wrapper">
+                <div class="orbiting-ring"></div>
+                <div class="profile-pic" id="secretIconTrigger">
+                    <img src="icono.png" alt="Vanessa">
+                </div>
+            </div>
+            <!-- AL TOCAR AQUÍ SE ABRE EL MENÚ PARA GUARDAR O CARGAR DATOS -->
+            <h1 onclick="openBackupModal()">Vanessa 🍓</h1>
+            <div class="live-clock" id="liveClock">Cargando hora...</div>
+        </header>
+
+        <!-- WIDGET DE ESTADO ACTUAL -->
+        <div class="schedule-widget">
+            <div class="sw-header">
+                <div class="sw-icon"><i id="statusIcon" class="fa-solid fa-heart"></i></div>
+                <div class="sw-main-info">
+                    <span class="sw-label" id="statusLabel">Clase Actual</span>
+                    <div class="sw-class" id="currentClass">Cargando...</div>
+                </div>
+            </div>
+            <div class="sw-progress-container"><div class="sw-progress-bar" id="progressBar"></div></div>
+            <div class="sw-footer">
+                <div class="sw-detail" id="timeLeft">Faltan --</div>
+                <div class="sw-next" id="nextClass">Siguiente: --</div>
+            </div>
+        </div>
+
+        <!-- SELECTOR DE DÍAS -->
+        <div class="day-selector">
+            <div class="day-btn" onclick="setDay(1)" id="btn-1">Lun</div>
+            <div class="day-btn" onclick="setDay(2)" id="btn-2">Mar</div>
+            <div class="day-btn" onclick="setDay(3)" id="btn-3">Mié</div>
+            <div class="day-btn" onclick="setDay(4)" id="btn-4">Jue</div>
+            <div class="day-btn" onclick="setDay(5)" id="btn-5">Vie</div>
+        </div>
+
+        <!-- TABLERO DE HORARIOS -->
+        <div class="schedule-board">
+            <div class="board-header">
+                <div class="col-head">Mis Clases 🍓</div>
+                <div class="col-head time-head">Hora</div>
+            </div>
+            <div class="board-body" id="boardBody">
+                <div class="grid-lines" id="gridLines"></div>
+                <div class="schedule-col" id="grid-vane"></div>
+                <div class="timeline-col" id="timeline"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL SECRETO (FOTO) -->
+    <div class="secret-modal" id="secretModal">
+        <div class="secret-content">
+            <div class="close-secret" onclick="document.getElementById('secretModal').classList.remove('show')">&times;</div>
+            <h3>🍓 Para ti...</h3>
+            <p id="secretMessageText">Cargando mensaje...</p>
+        </div>
+    </div>
+
+    <!-- MODAL DE RESPALDO (SAVE) -->
+    <div class="secret-modal" id="backupModal">
+        <div class="secret-content">
+            <div class="close-secret" onclick="document.getElementById('backupModal').classList.remove('show')">&times;</div>
+            <h3>☁️ Respaldo</h3>
+            <p style="margin-bottom: 20px; font-size: 0.95rem;">Guarda o recupera tus notas y contraseñas.</p>
+            
+            <button class="backup-btn" onclick="descargarRespaldo()">
+                <i class="fa-solid fa-download"></i> Descargar datos
+            </button>
+            
+            <label class="backup-btn upload">
+                <i class="fa-solid fa-upload"></i> Cargar datos
+                <input type="file" accept=".json" style="display:none;" onchange="cargarRespaldo(event)">
+            </label>
+        </div>
+    </div>
+
+<script>
+    const startHour = 14; 
+    const hourHeight = 80; 
+
+    const dbVane = {
+        1: [
+            {s: 14, d: 2, n: "Inv. Operac.", c: "bg-3", i: "fa-solid fa-chart-line"},
+            {s: 16, d: 1, n: "Instrum. Pres.", c: "bg-1", i: "fa-solid fa-pen"},
+            {s: 17, d: 1, n: "Entorno Macro.", c: "bg-4", i: "fa-solid fa-globe"},
+            {s: 18, d: 2, n: "Estad. Infer. I", c: "bg-2", i: "fa-solid fa-chart-bar"},
+            {s: 20, d: 1, n: "Emp. e Innov.", c: "bg-3", i: "fa-solid fa-lightbulb"}
+        ],
+        2: [
+            {s: 14, d: 2, n: "Hab Directivas", c: "bg-4", i: "fa-solid fa-users"},
+            {s: 16, d: 1, n: "Estad. Infer. I", c: "bg-2", i: "fa-solid fa-chart-bar"},
+            {s: 17, d: 1, n: "Instrum. Pres.", c: "bg-1", i: "fa-solid fa-pen"},
+            {s: 18, d: 2, n: "Ing Económica", c: "bg-1", i: "fa-solid fa-money-bill"},
+            {s: 20, d: 1, n: "Entorno Macro.", c: "bg-4", i: "fa-solid fa-globe"}
+        ],
+        3: [
+            {s: 14, d: 2, n: "Inv. Operac.", c: "bg-3", i: "fa-solid fa-chart-line"},
+            {s: 16, d: 2, n: "Instrum. Pres.", c: "bg-1", i: "fa-solid fa-pen"},
+            {s: 18, d: 1, n: "Estad. Infer. I", c: "bg-2", i: "fa-solid fa-chart-bar"},
+            {s: 19, d: 1, n: "Entorno Macro.", c: "bg-4", i: "fa-solid fa-globe"},
+            {s: 20, d: 1, n: "Emp. e Innov.", c: "bg-3", i: "fa-solid fa-lightbulb"}
+        ],
+        4: [
+            {s: 14, d: 2, n: "Hab Directivas", c: "bg-4", i: "fa-solid fa-users"},
+            {s: 16, d: 1, n: "Instrum. Pres.", c: "bg-1", i: "fa-solid fa-pen"},
+            {s: 17, d: 1, n: "Entorno Macro.", c: "bg-4", i: "fa-solid fa-globe"},
+            {s: 18, d: 2, n: "Ing Económica", c: "bg-1", i: "fa-solid fa-money-bill"},
+            {s: 20, d: 1, n: "Emp. e Innov.", c: "bg-3", i: "fa-solid fa-lightbulb"}
+        ],
+        5: [
+            {s: 14, d: 1, n: "Entorno Macro.", c: "bg-4", i: "fa-solid fa-globe"},
+            {s: 15, d: 1, n: "Inv. Operac.", c: "bg-3", i: "fa-solid fa-chart-line"},
+            {s: 16, d: 1, n: "Ing Económica", c: "bg-1", i: "fa-solid fa-money-bill"},
+            {s: 17, d: 2, n: "Estad. Infer. I", c: "bg-2", i: "fa-solid fa-chart-bar"},
+            {s: 19, d: 2, n: "Emp. e Innov.", c: "bg-3", i: "fa-solid fa-lightbulb"}
+        ]
+    };
+
+    // AQUI ESTÁN LAS NUEVAS FRASES ACTUALIZADAS
+    const mensajesBonitos = [
+        "A ver si esta vez pasamos Día de Muertos juntos jiji 💀🕯️🧡",
+        "Eres mi amorsote",
+        "No soy celoso solo que no me gusta compartir",
+        "Me encantan tus ojitos bonitos 👀✨",
+        "Haces que mis días grises se vuelvan de color 🌸",
+        "Un besote 😘",
+        "Contigo todo es mejor, preciosa 💕",
+        "No dejo de pensar en lo preciosota que estas 😍",
+        "Tengo muchas ganas de abrazarte y no soltarte 🫂❤️",
+        "Textraño mucho bastante 🥺",
+        "Gracias por ser tan especial conmigo ✨",
+        "Te extraño un montón cuando no estás 🥺",
+        "Amo cada momento que paso a tu lado 💖",
+        "Si crees que hare todo lo que me digas, tienes mucha razón 💘",
+        "Quiero llenarte de besos",
+        "Mi parte favorita del día es escuchar tu voz 📞",
+        "Eres mi persona favorita para todo 👫",
+        "Te adoro con todo mi corazón, mi amor ❤️"
+    ];
+
+    let currentDayIdx = new Date().getDay();
+    if(currentDayIdx === 0 || currentDayIdx === 6) currentDayIdx = 1;
+
+    document.addEventListener('DOMContentLoaded', () => {
+        initBoard();
+        setDay(currentDayIdx);
+        updateClock();
+        updateUI();
+        setInterval(updateClock, 1000);
+        setInterval(updateUI, 60000);
+    });
+
+    function initBoard() {
+        const lines = document.getElementById('gridLines');
+        const tl = document.getElementById('timeline');
+        lines.innerHTML = '';
+        tl.innerHTML = '';
+        for(let i=0; i<=7; i++) {
+            lines.innerHTML += `<div class="grid-line"></div>`;
+            tl.innerHTML += `<div class="time-label"><span>${formatTime12h(14+i, true)}</span></div>`;
+        }
+    }
+
+    document.getElementById('secretIconTrigger').addEventListener('click', () => {
+        const mensajeAleatorio = mensajesBonitos[Math.floor(Math.random() * mensajesBonitos.length)];
+        document.getElementById('secretMessageText').innerText = mensajeAleatorio;
+        document.getElementById('secretModal').classList.add('show');
+        if(navigator.vibrate) navigator.vibrate([40, 80, 40]);
+        createRain(); 
+    });
+
+    function openBackupModal() {
+        document.getElementById('backupModal').classList.add('show');
+        if(navigator.vibrate) navigator.vibrate(40);
+    }
+
+    function descargarRespaldo() {
+        const notas = localStorage.getItem('vane_notas');
+        const cuentas = localStorage.getItem('vane_cuentas');
+        if (!notas && !cuentas) {
+            alert('Aún no hay datos guardados para respaldar.');
+            return;
+        }
+        const backupData = { notas: notas ? JSON.parse(notas) : [], cuentas: cuentas ? JSON.parse(cuentas) : [] };
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
+        const downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute("href", dataStr);
+        downloadAnchorNode.setAttribute("download", "backup_vanessa.json");
+        document.body.appendChild(downloadAnchorNode); 
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
+        
+        if(navigator.vibrate) navigator.vibrate(100); 
+        document.getElementById('backupModal').classList.remove('show');
+    }
+
+    function cargarRespaldo(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const data = JSON.parse(e.target.result);
+                if (data.notas) localStorage.setItem('vane_notas', JSON.stringify(data.notas));
+                if (data.cuentas) localStorage.setItem('vane_cuentas', JSON.stringify(data.cuentas));
+                alert('¡Datos cargados correctamente! 💖');
+                document.getElementById('backupModal').classList.remove('show');
+            } catch (error) {
+                alert('Error al leer el archivo. Asegúrate de que sea el archivo correcto.');
+            }
+            event.target.value = '';
+        };
+        reader.readAsText(file);
+    }
+
+    function updateClock() {
+        const now = new Date();
+        const options = { weekday: 'long', day: 'numeric', month: 'long' };
+        let dateStr = now.toLocaleDateString('es-ES', options);
+        dateStr = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+        
+        let h = now.getHours();
+        let m = now.getMinutes();
+        let s = now.getSeconds();
+        const ampm = h >= 12 ? 'PM' : 'AM';
+        h = h % 12 || 12;
+        
+        const timeStr = `${h}:${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')} ${ampm}`;
+        document.getElementById('liveClock').innerText = `${dateStr} | ${timeStr}`;
+    }
+
+    function setDay(idx) {
+        currentDayIdx = idx;
+        document.querySelectorAll('.day-btn').forEach(b => b.classList.remove('active'));
+        const btn = document.getElementById(`btn-${idx}`);
+        if(btn) btn.classList.add('active');
+        
+        renderGrid('grid-vane', dbVane[idx]);
+        updateUI(); 
+    }
+
+    function formatTime12h(h, short = false) {
+        const hour = Math.floor(h);
+        const min = Math.round((h % 1) * 60);
+        const ampm = hour >= 12 ? 'PM' : 'AM';
+        const h12 = hour % 12 || 12;
+        if(short && min === 0) return `${h12} ${ampm}`;
+        return `${h12}:${min.toString().padStart(2, '0')} ${ampm}`;
+    }
+
+    function formatTimeLeft(totalMinutes) {
+        if (totalMinutes <= 0) return "¡Ahora!";
+        const h = Math.floor(totalMinutes / 60);
+        const m = totalMinutes % 60;
+        return h > 0 ? `${h}h ${m}m` : `${m} min`;
+    }
+
+    function renderGrid(containerId, classes) {
+        const container = document.getElementById(containerId);
+        container.innerHTML = '';
+        
+        if(!classes || classes.length === 0) return;
+        
+        classes.forEach(cls => {
+            const top = (cls.s - startHour) * hourHeight;
+            const height = cls.d * hourHeight;
+            
+            container.innerHTML += `
+                <div class="class-card ${cls.c}" data-start="${cls.s}" style="top: ${top}px; height: ${height - 4}px; margin-top: 2px;">
+                    <span class="cc-name">${cls.n}</span>
+                    <span class="cc-time"><i class="fa-regular fa-clock"></i> ${formatTime12h(cls.s)} - ${formatTime12h(cls.s+cls.d)}</span>
+                </div>
+            `;
+        });
+    }
+
+    function updateUI() {
+        const now = new Date();
+        const day = now.getDay() === 0 ? 0 : now.getDay();
+        const curTime = now.getHours() + (now.getMinutes() / 60);
+
+        document.querySelectorAll('.class-card').forEach(c => {
+            c.classList.remove('active-class');
+            const ind = c.querySelector('.current-indicator');
+            if (ind) ind.remove();
+        });
+
+        const classEl = document.getElementById('currentClass');
+        const timeEl = document.getElementById('timeLeft');
+        const nextEl = document.getElementById('nextClass');
+        const labelEl = document.getElementById('statusLabel');
+        const barEl = document.getElementById('progressBar');
+        const iconEl = document.getElementById('statusIcon');
+
+        if (day === 0 || day === 6) {
+            labelEl.innerText = "ESTADO";
+            classEl.innerText = "¡Día Libre! 🎉";
+            timeEl.innerText = "A descansar";
+            nextEl.innerText = "Nos vemos el Lunes";
+            barEl.style.width = "0%";
+            iconEl.className = "fa-solid fa-house-user";
+        } else {
+            const todayVane = dbVane[day] || [];
+            if (todayVane.length === 0) {
+                labelEl.innerText = "ESTADO";
+                classEl.innerText = "¡Día libre! 🎉";
+                timeEl.innerText = "A descansar";
+                barEl.style.width = "0%";
+                iconEl.className = "fa-solid fa-house-user";
+                nextEl.innerText = "Próximo: Lunes 2:00 PM";
+            } else {
+                const current = todayVane.find(c => curTime >= c.s && curTime < (c.s + c.d));
+                const upcoming = todayVane.filter(c => c.s > curTime).sort((a,b) => a.s - b.s);
+
+                if (current) {
+                    labelEl.innerText = "EN CURSO";
+                    classEl.innerText = current.n;
+                    iconEl.className = current.i;
+                    
+                    const totalMin = current.d * 60;
+                    const elapsedMin = (curTime - current.s) * 60;
+                    const remain = Math.round(totalMin - elapsedMin);
+                    
+                    timeEl.innerText = `Termina en ${formatTimeLeft(remain)}`;
+                    barEl.style.width = `${Math.min(100, (elapsedMin / totalMin) * 100)}%`;
+
+                    if (upcoming.length > 0) {
+                        const next = upcoming[0];
+                        const minToNext = Math.round((next.s - curTime) * 60);
+                        nextEl.innerText = `Sig: ${next.n} (en ${formatTimeLeft(minToNext)})`;
+                    } else {
+                        nextEl.innerText = "Último turno del día";
+                    }
+
+                    let activeBtn = document.querySelector('.day-btn.active');
+                    let viewDay = activeBtn ? parseInt(activeBtn.id.split('-')[1]) : 1;
+                    if (day === viewDay) {
+                        let activeCard = document.querySelector(`#grid-vane .class-card[data-start="${current.s}"]`);
+                        if (activeCard) {
+                            activeCard.classList.add('active-class');
+                            const badge = document.createElement('div');
+                            badge.className = 'current-indicator';
+                            badge.innerHTML = '¡AHORA!';
+                            activeCard.appendChild(badge);
+                        }
+                    }
+                } else if (upcoming.length > 0) {
+                    const next = upcoming[0];
+                    labelEl.innerText = "PRÓXIMO TURNO";
+                    classEl.innerText = next.n;
+                    iconEl.className = next.i || "fa-solid fa-clock";
+                    
+                    const remainToStart = Math.round((next.s - curTime) * 60);
+                    timeEl.innerText = `Empieza en ${formatTimeLeft(remainToStart)}`;
+                    barEl.style.width = "0%";
+                    nextEl.innerText = `Horario: ${formatTime12h(next.s)}`;
+                } else {
+                    labelEl.innerText = "ESTADO";
+                    classEl.innerText = "Día terminado 🌙";
+                    iconEl.className = "fa-solid fa-house-user";
+                    timeEl.innerText = "¡A descansar!";
+                    barEl.style.width = "0%";
+                    
+                    const nextDay = (day >= 5) ? 1 : day + 1;
+                    const nextDayClass = dbVane[nextDay] && dbVane[nextDay].length > 0 ? dbVane[nextDay][0] : null;
+                    
+                    if (nextDayClass) {
+                        const dayName = (day >= 5) ? "Lunes" : "Mañana";
+                        nextEl.innerText = `Próxima: ${dayName} a las ${formatTime12h(nextDayClass.s)}`;
+                    }
+                }
+            }
+        }
+    }
+
+    function createRain() {
+        const items = ['🍓', '💖', '✨', '🌸', '🎀'];
+        for(let i=0; i<25; i++) {
+            setTimeout(() => {
+                const drop = document.createElement('div');
+                drop.classList.add('falling-item');
+                drop.innerText = items[Math.floor(Math.random() * items.length)];
+                drop.style.left = Math.random() * 100 + 'vw';
+                drop.style.animationDuration = (Math.random() * 2 + 3) + 's';
+                document.body.appendChild(drop);
+                setTimeout(() => { drop.remove(); }, 5000);
+            }, i * 150);
+        }
+    }
+
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('./sw.js').catch(err => console.error('Error al registrar SW', err));
+        });
+    }
+</script>
+</body>
+</html>
